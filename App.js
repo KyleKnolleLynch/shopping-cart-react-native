@@ -1,22 +1,40 @@
-import React from 'react';
-import {View, Text, StyleSheet, Image} from 'react-native';
+import React, {useState} from 'react';
+import {View, FlatList, StyleSheet, Alert} from 'react-native';
+import Header from './components/Header';
+import Item from './components/Item';
+import AddItem from './components/AddItem';
+import Footer from './components/Footer';
+import {uuid} from 'uuidv4';
 
 const App = () => {
+  const [items, setItems] = useState([]);
+
+  const addItem = text => {
+    if (!text) {
+      Alert.alert('Error!', 'Please Add Item', [{text: 'OK'}]);
+    } else {
+      setItems(prevState => {
+        return [{id: uuid(), text}, ...prevState];
+      });
+    }
+  };
+
+  const deleteItem = id => {
+    setItems(prevState => {
+      return prevState.filter(item => item.id !== id);
+    });
+  };
+
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Image
-          source={require('./assets/images/icon.jpg')}
-          style={styles.img}
-        />
-        <Text style={styles.title}>Shopping Cart</Text>
-      </View>
-      <View style={styles.list}>
-        <Text>List</Text>
-      </View>
-      <View style={styles.footer}>
-        <Text>&copy; Kyle Lynch 2020</Text>
-      </View>
+      <Header title={'Shopping Cart'} />
+      <AddItem addItem={addItem} />
+      <FlatList
+        data={items}
+        renderItem={({item}) => <Item item={item} deleteItem={deleteItem} />}
+        keyExtractor={item => item.id}
+      />
+      <Footer footerTitle={' Kyle Lynch 2020'} />
     </View>
   );
 };
@@ -25,32 +43,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'whitesmoke',
-  },
-  header: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  img: {
-    width: 30,
-    height: 30,
-  },
-  title: {
-    color: 'tomato',
-    fontSize: 30,
-    fontFamily: 'fantasy',
-    fontWeight: 'bold',
-    padding: 14,
-  },
-  list: {
-    flex: 8,
-    width: '100%',
-  },
-  footer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });
 
